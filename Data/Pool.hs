@@ -120,7 +120,7 @@ instance Show (Pool a) where
                     "maxResources = " ++ show maxResources ++ "}"
 
 data TimeoutExceeded = TimeoutExceeded
-  deriving Show
+  deriving (Eq, Show)
 
 instance E.Exception TimeoutExceeded
 
@@ -309,7 +309,7 @@ takeResourceWithTimeout poolTimeout pool@Pool{..} =
       resource <- liftBase . join . atomically $ do
           stop <- readTVar shouldTimeout
           if stop
-            then E.throw TimeoutExceeded
+            then throwSTM TimeoutExceeded
             else do
               ents <- readTVar entries
               case ents of
